@@ -1,0 +1,24 @@
+[package]
+name = "Bridge"
+version = "0.0.1"
+# published-at = "0x84f0a6f53cbe3c7c2b586d7e0da8bbcafa1509a37fc4a4e8a393ba1e6779dffb"
+edition = "2024.beta"
+
+[dependencies.Sui]
+git = "https://github.com/MystenLabs/sui.git"
+subdir = "crates/sui-framework/packages/sui-framework"
+rev = "framework/testnet"
+
+[dependencies.MoveStdlib]
+git = "https://github.com/MystenLabs/sui.git"
+subdir = "crates/sui-framework/packages/move-stdlib"
+rev = "framework/testnet"
+
+[dependencies.SuiSystem]
+git = "https://github.com/MystenLabs/sui.git"
+subdir = "crates/sui-framework/packages/sui-system"
+rev = "framework/testnet"
+
+[addresses]
+bridge = "0x0"
+
