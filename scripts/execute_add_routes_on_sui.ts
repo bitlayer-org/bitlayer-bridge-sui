@@ -17,9 +17,8 @@ export const executeAddRoutesOnSUI = async (
   suiClient: SuiClient,
   tx: Transaction
 ) => {
-  const keypair = Ed25519Keypair.fromSecretKey(
-    process.env.ADMIN_PRIVATE_KEY || ''
-  )
+  const keypair = Ed25519Keypair.fromSecretKey(Buffer.from(config.admin(), 'hex') || '')
+
   const supported_chain_ids = []
   const supported_token_ids = []
   const fee_percentages = []
@@ -71,7 +70,7 @@ export const executeAddRoutesOnSUI = async (
   const serializeMessage = new Uint8Array(_result.results[2].returnValues[0][0])
   const signatures = []
   for (let c of config.committees) {
-    const signingKey = new ethers.SigningKey(c.privateKey())
+    const signingKey = new ethers.SigningKey(Buffer.from(c.privateKey(), 'hex'))
     const signature = fromHex(
       signingKey.sign(ethers.keccak256(serializeMessage)).serialized
     )

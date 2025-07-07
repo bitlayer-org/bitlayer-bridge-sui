@@ -10,7 +10,7 @@ export const executeUpdateBridgeLimit = async (
   tx: Transaction
 ) => {
   const keypair = Ed25519Keypair.fromSecretKey(
-    process.env.ADMIN_PRIVATE_KEY || ''
+    Buffer.from(config.admin(), 'hex') || ''
   )
   const supported_chain_ids = []
   const supported_token_ids = []
@@ -40,8 +40,8 @@ export const executeUpdateBridgeLimit = async (
     arguments: [
       _tx.pure.u8(config.id),
       seq_num,
-      _tx.pure.u8(4),
-      _tx.pure.u8(5),
+      _tx.pure.u8(250),
+      _tx.pure.u8(88),
       _tx.pure.u64(3500 * 10 ** 10),
     ],
   })
@@ -61,20 +61,27 @@ export const executeUpdateBridgeLimit = async (
   const serializeMessage = new Uint8Array(_result.results[2].returnValues[0][0])
   const signatures = []
   for (let c of config.committees) {
-    const signingKey = new ethers.SigningKey(c.privateKey())
+    const signingKey = new ethers.SigningKey(Buffer.from(c.privateKey(), 'hex'))
     const signature = fromHex(
       signingKey.sign(ethers.keccak256(serializeMessage)).serialized
     )
     signatures.push(signature)
   }
 
+  /**
+   * source_chain_id: u8,
+        seq_num: u64,
+        sending_chain: u8,
+        sending_token: u8,
+        new_limit: u64,
+   */
   const [message] = tx.moveCall({
     target: `${config.package()}::message::create_update_bridge_limit_message`,
     arguments: [
       tx.pure.u8(config.id),
       tx.pure.u64(0),
-      tx.pure.u8(4),
-      tx.pure.u8(5),
+      tx.pure.u8(250),
+      tx.pure.u8(88),
       tx.pure.u64(3500 * 10 ** 10),
     ],
   })

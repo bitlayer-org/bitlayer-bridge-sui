@@ -9,7 +9,7 @@ export const createCommittee = async (
   suiClient: SuiClient,
   tx: Transaction
 ) => {
-  const keypair = Ed25519Keypair.fromSecretKey(config.submitter() || '')
+  const keypair = Ed25519Keypair.fromSecretKey(Buffer.from(config.admin(), 'hex') || '')
   const pubkeys = []
   const stakeds = []
   config.committees.map((c) => {

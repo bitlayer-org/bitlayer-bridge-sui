@@ -4,7 +4,7 @@ import { config } from './config'
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519'
 
 export const registerToken = async (suiClient: SuiClient, tx: Transaction) => {
-  const keypair = Ed25519Keypair.fromSecretKey(config.submitter() || '')
+  const keypair = Ed25519Keypair.fromSecretKey(Buffer.from(config.admin(), 'hex') || '')
   tx.moveCall({
     target: `${config.package()}::bridge::register_foreign_token`,
     typeArguments: [config.sbtc_coin_type()],

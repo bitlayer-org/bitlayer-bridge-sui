@@ -6,12 +6,12 @@ import { SuiClient } from '@mysten/sui/dist/cjs/client'
 
 export const sendToken = async (suiClient: SuiClient, tx: Transaction) => {
   const keypair = Ed25519Keypair.fromSecretKey(
-    process.env.SUI_TEST_PRIVATE_KEY || ''
+    Buffer.from(config.admin(), 'hex') || ''
   )
 
   let target_address = fromHex(process.env.EVM_USER_ADDRESS || '')
-  let target_chain = 4
-  let token_type = 5
+  let target_chain = 250
+  let token_type = 88
   let token = process.env.TOKEN_OBJECT_ID || ''
 
   tx.moveCall({

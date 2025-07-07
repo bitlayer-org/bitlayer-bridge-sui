@@ -9,12 +9,14 @@ export const committeeRegistration = async (
   suiClient: SuiClient,
   tx: Transaction
 ) => {
-  const keypair = Ed25519Keypair.fromSecretKey(config.submitter() || '')
+  const keypair = Ed25519Keypair.fromSecretKey(Buffer.from(config.admin(), 'hex') || '')
   const pubkeys = []
   config.committees.map((c) => {
     const wallet = new Wallet(c.privateKey())
     pubkeys.push(fromHex(wallet.address))
+    console.log('wallet: ', wallet.address)
   })
+  // process.exit(0)
 
   tx.moveCall({
     target: `${config.package()}::bridge::committee_registration`,

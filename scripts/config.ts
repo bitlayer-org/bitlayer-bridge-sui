@@ -9,35 +9,26 @@ export const config = {
   package: () => process.env.PACKAGE || '',
   admin_cap: () => process.env.ADMIN_CAP_ID || '',
   bridge: () => process.env.BRIGE_OBJECT_ID || '',
-  submitter: () => process.env.ADMIN_PRIVATE_KEY || '',
+  admin: () => process.env.ADMIN_PRIVATE_KEY || '',
+  submitter: () => process.env.SUBMITTER || '',
   sbtc_coin_type: () => process.env.SBTC_COIN_TYPE || '',
   sbtc_metadata: () => process.env.SBTC_METADATA || '',
   sbtc_treasury: () => process.env.SBTC_TREASURY || '',
   committees: [
     {
       privateKey: () => process.env.COMMITTEE1 || '',
-      staked: 3334,
+      staked: 10001,
       isblacklisted: false,
-    },
-    {
-      privateKey: () => process.env.COMMITTEE2 || '',
-      staked: 3333,
-      isblacklisted: false,
-    },
-    {
-      privateKey: () => process.env.COMMITTEE3 || '',
-      staked: 3333,
-      isblacklisted: false,
-    },
+    }
   ],
   supported_chains: {
-    4: [
+    250: [
       {
-        token_id: 5,
-        fee_percentage: 2000,
+        token_id: 88,
+        fee_percentage: 1000,
         bridge_amount: 0,
         supported: true,
-        limit: 10 ** 10 * 3500,
+        limit: 10 ** 8 * 1000,
       },
     ],
   },

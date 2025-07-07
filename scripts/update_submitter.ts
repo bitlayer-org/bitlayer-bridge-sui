@@ -7,13 +7,13 @@ export const updateSubmitter = async (
   suiClient: SuiClient,
   tx: Transaction
 ) => {
-  const keypair = Ed25519Keypair.fromSecretKey(config.submitter() || '')
+  const keypair = Ed25519Keypair.fromSecretKey(Buffer.from(config.admin(), 'hex') || '')
   tx.moveCall({
     target: `${config.package()}::bridge::update_submitter`,
     arguments: [
       tx.object(config.bridge()),
       tx.object(config.admin_cap()),
-      tx.pure.address(keypair.getPublicKey().toSuiAddress()),
+      tx.pure.address(config.submitter()),
       tx.pure.bool(true),
     ],
   })

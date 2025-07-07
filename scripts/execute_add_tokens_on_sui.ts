@@ -18,7 +18,7 @@ export const executeAddTokensOnSUI = async (
   tx: Transaction
 ) => {
   const keypair = Ed25519Keypair.fromSecretKey(
-    process.env.ADMIN_PRIVATE_KEY || ''
+    Buffer.from(config.admin(), 'hex') || ''
   )
 
   const __tx = new Transaction()
@@ -90,7 +90,7 @@ export const executeAddTokensOnSUI = async (
   console.log('serializeMessage:', serializeMessage)
   const signatures = []
   for (let c of config.committees) {
-    const signingKey = new ethers.SigningKey(c.privateKey())
+    const signingKey = new ethers.SigningKey(Buffer.from(c.privateKey(), 'hex'))
     const signature = fromHex(
       signingKey.sign(ethers.keccak256(serializeMessage)).serialized
     )
