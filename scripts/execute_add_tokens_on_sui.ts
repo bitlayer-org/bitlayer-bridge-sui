@@ -17,9 +17,7 @@ export const executeAddTokensOnSUI = async (
   suiClient: SuiClient,
   tx: Transaction
 ) => {
-  const keypair = Ed25519Keypair.fromSecretKey(
-    Buffer.from(config.admin(), 'hex') || ''
-  )
+  const keypair = Ed25519Keypair.fromSecretKey(fromHex(config.admin()) || '')
 
   const __tx = new Transaction()
 
@@ -60,55 +58,12 @@ export const executeAddTokensOnSUI = async (
       _tx.pure.u8(MessageType.ADD_TOKENS_ON_SUI),
     ],
   })
-  const [m] = _tx.moveCall({
-    target: `${config.package()}::message::create_add_tokens_on_sui_message`,
-    arguments: [
-      _tx.pure.u8(config.id),
-      seq_num,
-      _tx.pure.bool(false),
-      _tx.pure.vector('u8', supported_token_ids),
-      _tx.pure(bcs.vector(bcs.vector(bcs.u8())).serialize(token_types)),
-      _tx.pure.vector('u64', token_prices),
-    ],
-  })
-  _tx.moveCall({
-    target: `${config.package()}::message::serialize_message`,
-    arguments: [m],
-  })
-
-  const _result = await suiClient.devInspectTransactionBlock({
-    transactionBlock: _tx,
-    sender: keypair.getPublicKey().toSuiAddress(),
-  })
-
-  // return
-  const bridgeMessage = new Uint8Array(_result.results[1].returnValues[0][0])
-  console.log('bridgeMessage:', bridgeMessage)
-
-  _result.results[2].returnValues[0][0].shift()
-  const serializeMessage = new Uint8Array(_result.results[2].returnValues[0][0])
-  console.log('serializeMessage:', serializeMessage)
-  const signatures = []
-  for (let c of config.committees) {
-    const signingKey = new ethers.SigningKey(Buffer.from(c.privateKey(), 'hex'))
-    const signature = fromHex(
-      signingKey.sign(ethers.keccak256(serializeMessage)).serialized
-    )
-    signatures.push(signature)
-    // tx.moveCall({
-    //   target: `${config.package()}::committee::recover_signer`,
-    //   arguments: [
-    //     tx.pure(bridgeMessage),
-    //     bcs.vector(bcs.u8()).serialize(signature),
-    //   ],
-    // })
-  }
 
   const [message] = tx.moveCall({
     target: `${config.package()}::message::create_add_tokens_on_sui_message`,
     arguments: [
       tx.pure.u8(config.id),
-      tx.pure.u64(0),
+      seq_num,
       tx.pure.bool(false),
       tx.pure.vector('u8', supported_token_ids),
       tx.pure(bcs.vector(bcs.vector(bcs.u8())).serialize(token_types)),
@@ -119,8 +74,8 @@ export const executeAddTokensOnSUI = async (
     target: `${config.package()}::bridge::execute_system_message`,
     arguments: [
       tx.object(config.bridge()),
+      tx.object(config.admin_cap()),
       message,
-      bcs.vector(bcs.vector(bcs.u8())).serialize(signatures),
     ],
   })
 

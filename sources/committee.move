@@ -21,7 +21,7 @@ module bridge::committee {
     const ECommitteeBlocklistContainsUnknownKey: u64 = 4;
     // const ESenderNotActiveCommittee: u64 = 5;
     const EInvalidPubkeyLength: u64 = 6;
-    const ECommitteeAlreadyInitiated: u64 = 7;
+    // const ECommitteeAlreadyInitiated: u64 = 7;
     // const EDuplicatePubkey: u64 = 8;
     // const ESenderIsNotInBridgeCommittee: u64 = 9;
 
@@ -189,7 +189,7 @@ module bridge::committee {
         bridge_member_address_vec: vector<vector<u8>>,
     ) {
         // We disallow registration after committee initiated in v1
-        assert!(self.members.is_empty(), ECommitteeAlreadyInitiated);
+        // assert!(self.members.is_empty(), ECommitteeAlreadyInitiated);
         
         let mut i = 0;
         let mut new_registrations = vec_map::empty();

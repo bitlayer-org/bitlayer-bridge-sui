@@ -9,9 +9,7 @@ export const executeUpdateBridgeLimit = async (
   suiClient: SuiClient,
   tx: Transaction
 ) => {
-  const keypair = Ed25519Keypair.fromSecretKey(
-    Buffer.from(config.admin(), 'hex') || ''
-  )
+  const keypair = Ed25519Keypair.fromSecretKey(fromHex(config.admin()) || '')
   const supported_chain_ids = []
   const supported_token_ids = []
   const fee_percentages = []
@@ -79,7 +77,7 @@ export const executeUpdateBridgeLimit = async (
     target: `${config.package()}::message::create_update_bridge_limit_message`,
     arguments: [
       tx.pure.u8(config.id),
-      tx.pure.u64(0),
+      seq_num,
       tx.pure.u8(250),
       tx.pure.u8(88),
       tx.pure.u64(3500 * 10 ** 10),
@@ -89,9 +87,8 @@ export const executeUpdateBridgeLimit = async (
     target: `${config.package()}::bridge::execute_system_message`,
     arguments: [
       tx.object(config.bridge()),
-      // _bridgeMessage,
+      tx.object(config.admin_cap()),
       message,
-      bcs.vector(bcs.vector(bcs.u8())).serialize(signatures),
     ],
   })
 

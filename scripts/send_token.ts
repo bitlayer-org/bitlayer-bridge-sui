@@ -5,9 +5,7 @@ import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519'
 import { SuiClient } from '@mysten/sui/dist/cjs/client'
 
 export const sendToken = async (suiClient: SuiClient, tx: Transaction) => {
-  const keypair = Ed25519Keypair.fromSecretKey(
-    Buffer.from(config.admin(), 'hex') || ''
-  )
+  const keypair = Ed25519Keypair.fromSecretKey(fromHex(config.admin()) || '')
 
   let target_address = fromHex(process.env.EVM_USER_ADDRESS || '')
   let target_chain = 250

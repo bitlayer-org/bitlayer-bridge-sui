@@ -209,6 +209,16 @@ module bridge::bridge {
         transfer::share_object(bridge);
     }
 
+    public fun withdraw_treasury<T>(
+        bridge: &mut Bridge,
+        admin_cap: &AdminCap,
+        receipt: address,
+    ) {
+        assert_admin_version(admin_cap);
+        let inner = load_inner_mut(bridge);
+        inner.treasury.withdraw_treasury<T>(receipt);
+    }
+
     public fun update_fee_recipient(
         bridge: &mut Bridge,
         admin_cap: &AdminCap,
@@ -519,9 +529,11 @@ module bridge::bridge {
 
     public fun execute_system_message(
         bridge: &mut Bridge,
-        message: BridgeMessage,
-        signatures: vector<vector<u8>>,
+        admin_cap: &AdminCap,
+        message: BridgeMessage
     ) {
+        assert_admin_version(admin_cap);
+
         let message_type = message.message_type();
 
         // TODO: test version mismatch
@@ -534,7 +546,7 @@ module bridge::bridge {
         let expected_seq_num = inner.get_current_seq_num_and_increment(message_type);
         assert!(message.seq_num() == expected_seq_num, EUnexpectedSeqNum);
 
-        inner.committee.verify_signatures(message, signatures);
+        // inner.committee.verify_signatures(message, signatures);
 
         if (message_type == message_types::emergency_op()) {
             let payload = message.extract_emergency_op_payload();

@@ -9,7 +9,7 @@ export const committeeRegistration = async (
   suiClient: SuiClient,
   tx: Transaction
 ) => {
-  const keypair = Ed25519Keypair.fromSecretKey(Buffer.from(config.admin(), 'hex') || '')
+  const keypair = Ed25519Keypair.fromSecretKey(fromHex(config.admin()) || '')
   const pubkeys = []
   config.committees.map((c) => {
     const wallet = new Wallet(c.privateKey())

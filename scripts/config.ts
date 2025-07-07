@@ -16,7 +16,7 @@ export const config = {
   sbtc_treasury: () => process.env.SBTC_TREASURY || '',
   committees: [
     {
-      privateKey: () => process.env.COMMITTEE1 || '',
+      privateKey: () => process.env.ADMIN_PRIVATE_KEY || '',
       staked: 10001,
       isblacklisted: false,
     }

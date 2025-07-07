@@ -10,11 +10,13 @@ import { executeAddTokensOnSUI } from './execute_add_tokens_on_sui'
 import { executeUpdateBridgeLimit } from './execute_update_bridge_limit'
 import { approveTokenTransferAndClaim } from './approve_token_transfer_and_cliam'
 import { sendToken } from './send_token'
+import { withdrawTreasury } from './withdraw_treasury'
+import { transferAdminCap } from './transfer_admin_cap'
 
 configDotenv()
 
 async function main() {
-  const suiClient = new SuiClient({ url: getFullnodeUrl('testnet') })
+  const suiClient = new SuiClient({ url: getFullnodeUrl('localnet') })
   const tx = new Transaction()
 
   // 1. update submitter
@@ -22,6 +24,8 @@ async function main() {
 
   // 2. register token
   // await registerToken(suiClient, tx)
+
+  // await withdrawTreasury(suiClient, tx)
 
   // 3. register committee
   // await committeeRegistration(suiClient, tx)
@@ -42,7 +46,10 @@ async function main() {
   //   await approveTokenTransferAndClaim(suiClient, tx)
 
   // 9. send token
-  await sendToken(suiClient, tx)
+  // await sendToken(suiClient, tx)
+
+  // 10. transfer admin cap
+  await transferAdminCap(suiClient, tx)
 }
 main().catch((error) => {
   console.error(error)

@@ -17,7 +17,7 @@ export const executeAddRoutesOnSUI = async (
   suiClient: SuiClient,
   tx: Transaction
 ) => {
-  const keypair = Ed25519Keypair.fromSecretKey(Buffer.from(config.admin(), 'hex') || '')
+  const keypair = Ed25519Keypair.fromSecretKey(fromHex(config.admin()) || '')
 
   const supported_chain_ids = []
   const supported_token_ids = []
@@ -59,29 +59,11 @@ export const executeAddRoutesOnSUI = async (
     arguments: [m],
   })
 
-  const _result = await suiClient.devInspectTransactionBlock({
-    transactionBlock: _tx,
-    sender: keypair.getPublicKey().toSuiAddress(),
-  })
-
-  const bridgeMessage = new Uint8Array(_result.results[1].returnValues[0][0])
-
-  _result.results[2].returnValues[0][0].shift()
-  const serializeMessage = new Uint8Array(_result.results[2].returnValues[0][0])
-  const signatures = []
-  for (let c of config.committees) {
-    const signingKey = new ethers.SigningKey(Buffer.from(c.privateKey(), 'hex'))
-    const signature = fromHex(
-      signingKey.sign(ethers.keccak256(serializeMessage)).serialized
-    )
-    signatures.push(signature)
-  }
-
   const [message] = tx.moveCall({
     target: `${config.package()}::message::create_add_routes_on_sui_message`,
     arguments: [
       tx.pure.u8(config.id),
-      tx.pure.u64(0),
+      seq_num,
       tx.pure.vector('u8', supported_chain_ids),
       tx.pure.vector('u8', supported_token_ids),
       tx.pure.vector('u64', fee_percentages),
@@ -93,9 +75,8 @@ export const executeAddRoutesOnSUI = async (
     target: `${config.package()}::bridge::execute_system_message`,
     arguments: [
       tx.object(config.bridge()),
-      // _bridgeMessage,
+      tx.object(config.admin_cap()),
       message,
-      bcs.vector(bcs.vector(bcs.u8())).serialize(signatures),
     ],
   })
 
