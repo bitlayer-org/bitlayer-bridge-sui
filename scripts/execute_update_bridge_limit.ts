@@ -53,18 +53,18 @@ export const executeUpdateBridgeLimit = async (
     sender: keypair.getPublicKey().toSuiAddress(),
   })
 
-  const bridgeMessage = new Uint8Array(_result.results[1].returnValues[0][0])
+  // const bridgeMessage = new Uint8Array(_result.results[1].returnValues[0][0])
 
   _result.results[2].returnValues[0][0].shift()
-  const serializeMessage = new Uint8Array(_result.results[2].returnValues[0][0])
-  const signatures = []
-  for (let c of config.committees) {
-    const signingKey = new ethers.SigningKey(Buffer.from(c.privateKey(), 'hex'))
-    const signature = fromHex(
-      signingKey.sign(ethers.keccak256(serializeMessage)).serialized
-    )
-    signatures.push(signature)
-  }
+  // const serializeMessage = new Uint8Array(_result.results[2].returnValues[0][0])
+  // const signatures = []
+  // for (let c of config.committees) {
+  //   const signingKey = new ethers.SigningKey(Buffer.from(c.privateKey(), 'hex'))
+  //   const signature = fromHex(
+  //     signingKey.sign(ethers.keccak256(serializeMessage)).serialized
+  //   )
+  //   signatures.push(signature)
+  // }
 
   /**
    * source_chain_id: u8,

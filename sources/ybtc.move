@@ -1,19 +1,19 @@
-module bridge::sbtc {
+module bridge::ybtc {
     use bridge::bridge::initializer;
     use sui::coin::create_currency;
 
-    public struct SBTC has drop {}
+    public struct YBTC has drop {}
 
     fun init(
-        otw: SBTC,
+        otw: YBTC,
         ctx: &mut TxContext,
     ) {
         let (treasury_cap, metadata) = create_currency(
             otw,
-            10,
-            b"sBTC",
-            b"Sui Bitcoin",
-            b"Sui bridge Bitcoin token",
+            8,
+            b"YBTC",
+            b"Yield Bitcoin",
+            b"Yield bridge Bitcoin token",
             option::none(),
             ctx,
         );
@@ -23,7 +23,7 @@ module bridge::sbtc {
     }
 
     #[test_only]
-    public fun init_test(otw: SBTC,
+    public fun init_test(otw: YBTC,
         ctx: &mut TxContext,){
         init(otw, ctx)
     }

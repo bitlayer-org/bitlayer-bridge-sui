@@ -2,7 +2,7 @@
 
 [move]
 version = 3
-manifest_digest = "57487B3372C3902D3BD364495ABE08D20B4C6435155C729F64EC94127251CEE5"
+manifest_digest = "0C8DCB6B7F0738151E98D82AA39A0FB037B483525609C74E3F88780068834479"
 deps_digest = "060AD7E57DFB13104F21BE5F5C3759D03F0553FC3229247D9A7A6B45F50D03A3"
 dependencies = [
   { id = "MoveStdlib", name = "MoveStdlib" },
@@ -40,12 +40,12 @@ flavor = "sui"
 
 [env.testnet]
 chain-id = "4c78adac"
-original-published-id = "0xafbc3f8f8c93b468b1b3482e5cc29d38ebd8ca931591900217567bd6e47f0457"
-latest-published-id = "0xafbc3f8f8c93b468b1b3482e5cc29d38ebd8ca931591900217567bd6e47f0457"
+original-published-id = "0x416dd6afb043e530cc56af2b60d375f32aad6008f8d0f4a03e0fef1b8d2aba3c"
+latest-published-id = "0x416dd6afb043e530cc56af2b60d375f32aad6008f8d0f4a03e0fef1b8d2aba3c"
 published-version = "1"
 
 [env.localnet]
-chain-id = "6cb34420"
-original-published-id = "0xf5f946740c6639c69a14a9287c5e983cf5a95491c6a9b8f0a2ad7a8609bc0b64"
-latest-published-id = "0xf5f946740c6639c69a14a9287c5e983cf5a95491c6a9b8f0a2ad7a8609bc0b64"
-published-version = "1"
+chain-id = "ea876617"
+original-published-id = "0x45b8ad80ead412878fdbffaadca2c675648e474c947242c2455875eb66f32de3"
+latest-published-id = "0x1248e600dc6b6729c439e7a5825d7928598c3e6e38ad27a081fc86d9b8779183"
+published-version = "2"

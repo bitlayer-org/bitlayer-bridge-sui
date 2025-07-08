@@ -12,11 +12,13 @@ import { approveTokenTransferAndClaim } from './approve_token_transfer_and_cliam
 import { sendToken } from './send_token'
 import { withdrawTreasury } from './withdraw_treasury'
 import { transferAdminCap } from './transfer_admin_cap'
+import { migrateAdminCapVersion } from './migrate_admin_cap_version'
+import { migrateBridgeVersion } from './migrate_bridge_version'
 
 configDotenv()
 
 async function main() {
-  const suiClient = new SuiClient({ url: getFullnodeUrl('localnet') })
+  const suiClient = new SuiClient({ url: getFullnodeUrl('testnet') })
   const tx = new Transaction()
 
   // 1. update submitter
@@ -26,6 +28,8 @@ async function main() {
   // await registerToken(suiClient, tx)
 
   // await withdrawTreasury(suiClient, tx)
+  // await migrateAdminCapVersion(suiClient, tx)
+  // await migrateBridgeVersion(suiClient, tx)
 
   // 3. register committee
   // await committeeRegistration(suiClient, tx)
@@ -37,7 +41,7 @@ async function main() {
   // await executeAddRoutesOnSUI(suiClient, tx)
 
   // 6. execute add tokens on sui
-  // await executeAddTokensOnSUI(suiClient, tx)
+  await executeAddTokensOnSUI(suiClient, tx)
 
   // 7. execute update bridge limit
   // await executeUpdateBridgeLimit(suiClient, tx)
@@ -49,7 +53,7 @@ async function main() {
   // await sendToken(suiClient, tx)
 
   // 10. transfer admin cap
-  await transferAdminCap(suiClient, tx)
+  // await transferAdminCap(suiClient, tx)
 }
 main().catch((error) => {
   console.error(error)

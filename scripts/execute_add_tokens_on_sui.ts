@@ -51,7 +51,7 @@ export const executeAddTokensOnSUI = async (
   }
 
   const _tx = new Transaction()
-  const [seq_num] = _tx.moveCall({
+  _tx.moveCall({
     target: `${config.package()}::bridge::get_current_seq_num`,
     arguments: [
       _tx.object(config.bridge()),
@@ -59,11 +59,16 @@ export const executeAddTokensOnSUI = async (
     ],
   })
 
+  const _result = await suiClient.devInspectTransactionBlock({
+    transactionBlock: _tx,
+    sender: keypair.getPublicKey().toSuiAddress(),
+  })
+
   const [message] = tx.moveCall({
     target: `${config.package()}::message::create_add_tokens_on_sui_message`,
     arguments: [
       tx.pure.u8(config.id),
-      seq_num,
+      tx.pure.u64(_result.results[0].returnValues[0][0].shift()),
       tx.pure.bool(false),
       tx.pure.vector('u8', supported_token_ids),
       tx.pure(bcs.vector(bcs.vector(bcs.u8())).serialize(token_types)),

@@ -35,35 +35,24 @@ export const executeAddRoutesOnSUI = async (
   }
 
   const _tx = new Transaction()
-  const [seq_num] = _tx.moveCall({
+  _tx.moveCall({
     target: `${config.package()}::bridge::get_current_seq_num`,
     arguments: [
       _tx.object(config.bridge()),
       _tx.pure.u8(MessageType.ADD_ROUTES_ON_SUI),
     ],
   })
-  const [m] = _tx.moveCall({
-    target: `${config.package()}::message::create_add_routes_on_sui_message`,
-    arguments: [
-      _tx.pure.u8(config.id),
-      seq_num,
-      _tx.pure.vector('u8', supported_chain_ids),
-      _tx.pure.vector('u8', supported_token_ids),
-      _tx.pure.vector('u64', fee_percentages),
-      _tx.pure.vector('u64', bridge_amounts),
-      _tx.pure.vector('bool', supporteds),
-    ],
-  })
-  _tx.moveCall({
-    target: `${config.package()}::message::serialize_message`,
-    arguments: [m],
+  
+  const _result = await suiClient.devInspectTransactionBlock({
+    transactionBlock: _tx,
+    sender: keypair.getPublicKey().toSuiAddress(),
   })
 
   const [message] = tx.moveCall({
     target: `${config.package()}::message::create_add_routes_on_sui_message`,
     arguments: [
       tx.pure.u8(config.id),
-      seq_num,
+      tx.pure.u64(_result.results[0].returnValues[0][0].shift()),
       tx.pure.vector('u8', supported_chain_ids),
       tx.pure.vector('u8', supported_token_ids),
       tx.pure.vector('u64', fee_percentages),

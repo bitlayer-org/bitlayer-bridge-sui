@@ -13,11 +13,11 @@ export const createCommittee = async (
   const pubkeys = []
   const stakeds = []
   config.committees.map((c) => {
-    const wallet = new ethers.Wallet(c.privateKey())
+    // const wallet = new ethers.Wallet(c.privateKey())
     // wallet.address
     // const sign = new SigningKey(c.privateKey())
 
-    pubkeys.push(fromHex(wallet.address))
+    pubkeys.push(fromHex(c.address()))
     stakeds.push(c.staked)
   })
 

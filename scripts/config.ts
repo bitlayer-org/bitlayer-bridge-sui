@@ -14,9 +14,10 @@ export const config = {
   sbtc_coin_type: () => process.env.SBTC_COIN_TYPE || '',
   sbtc_metadata: () => process.env.SBTC_METADATA || '',
   sbtc_treasury: () => process.env.SBTC_TREASURY || '',
+  upgrade_cap: () => process.env.UPGRADE_CAP_ID || '',
   committees: [
     {
-      privateKey: () => process.env.ADMIN_PRIVATE_KEY || '',
+      address: () => process.env.COMMITTEE1 || '',
       staked: 10001,
       isblacklisted: false,
     }

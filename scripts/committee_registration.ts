@@ -12,9 +12,9 @@ export const committeeRegistration = async (
   const keypair = Ed25519Keypair.fromSecretKey(fromHex(config.admin()) || '')
   const pubkeys = []
   config.committees.map((c) => {
-    const wallet = new Wallet(c.privateKey())
-    pubkeys.push(fromHex(wallet.address))
-    console.log('wallet: ', wallet.address)
+    // const wallet = new Wallet(c.privateKey())
+    pubkeys.push(fromHex(c.address()))
+    // console.log('wallet: ', wallet.address)
   })
   // process.exit(0)
 
