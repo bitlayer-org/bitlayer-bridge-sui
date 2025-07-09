@@ -265,13 +265,11 @@ module bridge::bridge {
         ctx: &TxContext
     ) {
         let inner = load_inner_mut(bridge);
-        if (inner.committee.committee_members().is_empty()) {
-            inner.committee.try_create_next_committee(
-                active_committee_powers,
-                min_stake_participation_percentage,
-                ctx,
-            )
-        }
+        inner.committee.try_create_next_committee(
+            active_committee_powers,
+            min_stake_participation_percentage,
+            ctx,
+        )
     }
 
     public fun create_bridge_committee_by_vec(
@@ -296,21 +294,19 @@ module bridge::bridge {
         let len = active_committees.length();
         assert!(active_committees.length() == active_powers.length(), EInitCommitteeParamsInvalid);
         let inner = load_inner_mut(bridge);
-        if (inner.committee.committee_members().is_empty()) {
-            let mut active_committee_powers = vec_map::empty<vector<u8>, u64>();
-            let mut i = 0;
-            while (i < len) {
-              let active_committee = active_committees.borrow(i);
-              let active_power = active_powers.borrow(i);
-              active_committee_powers.insert(*active_committee, *active_power);
-              i = i + 1;
-            };
-            inner.committee.try_create_next_committee(
-                active_committee_powers,
-                min_stake_participation_percentage,
-                ctx,
-            )
-        }
+        let mut active_committee_powers = vec_map::empty<vector<u8>, u64>();
+        let mut i = 0;
+        while (i < len) {
+            let active_committee = active_committees.borrow(i);
+            let active_power = active_powers.borrow(i);
+            active_committee_powers.insert(*active_committee, *active_power);
+            i = i + 1;
+        };
+        inner.committee.try_create_next_committee(
+            active_committee_powers,
+            min_stake_participation_percentage,
+            ctx,
+        )
     }
 
     //////////////////////////////////////////////////////
