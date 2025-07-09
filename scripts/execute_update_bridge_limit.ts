@@ -26,26 +26,12 @@ export const executeUpdateBridgeLimit = async (
   }
 
   const _tx = new Transaction()
-  const [seq_num] = _tx.moveCall({
+  _tx.moveCall({
     target: `${config.package()}::bridge::get_current_seq_num`,
     arguments: [
       _tx.object(config.bridge()),
       _tx.pure.u8(MessageType.UPDATE_BRIDGE_LIMIT),
     ],
-  })
-  const [m] = _tx.moveCall({
-    target: `${config.package()}::message::create_update_bridge_limit_message`,
-    arguments: [
-      _tx.pure.u8(config.id),
-      seq_num,
-      _tx.pure.u8(250),
-      _tx.pure.u8(88),
-      _tx.pure.u64(3500 * 10 ** 10),
-    ],
-  })
-  _tx.moveCall({
-    target: `${config.package()}::message::serialize_message`,
-    arguments: [m],
   })
 
   const _result = await suiClient.devInspectTransactionBlock({
@@ -53,9 +39,10 @@ export const executeUpdateBridgeLimit = async (
     sender: keypair.getPublicKey().toSuiAddress(),
   })
 
+
   // const bridgeMessage = new Uint8Array(_result.results[1].returnValues[0][0])
 
-  _result.results[2].returnValues[0][0].shift()
+  // _result.results[2].returnValues[0][0].shift()
   // const serializeMessage = new Uint8Array(_result.results[2].returnValues[0][0])
   // const signatures = []
   // for (let c of config.committees) {
@@ -77,7 +64,7 @@ export const executeUpdateBridgeLimit = async (
     target: `${config.package()}::message::create_update_bridge_limit_message`,
     arguments: [
       tx.pure.u8(config.id),
-      seq_num,
+      tx.pure.u64(_result.results[0].returnValues[0][0].shift()),
       tx.pure.u8(250),
       tx.pure.u8(88),
       tx.pure.u64(3500 * 10 ** 10),
