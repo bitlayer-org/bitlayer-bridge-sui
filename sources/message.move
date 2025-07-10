@@ -3,6 +3,7 @@
 
 module bridge::message {
     use std::ascii::{Self, String};
+    use std::string;
     use sui::bcs::{Self, BCS};
 
     use bridge::chain_ids;
@@ -22,6 +23,8 @@ module bridge::message {
     // Emergency Op types
     const PAUSE: u8 = 0;
     const UNPAUSE: u8 = 1;
+
+    const PREFIX_ETH: vector<u8> = b"\x19Ethereum Signed Message:\n";
 
     //////////////////////////////////////////////////////
     // Types
@@ -246,7 +249,17 @@ module bridge::message {
         message.append(reverse_bytes(bcs::to_bytes(&seq_num)));
         message.push_back(source_chain);
         message.append(payload);
-        message
+
+        // message
+
+        let length = vector::length(&message);
+
+        let mut message_with_prefix = vector[];
+        message_with_prefix.append(PREFIX_ETH);
+        message_with_prefix.append(string::into_bytes(length.to_string()));
+        message_with_prefix.append(message);
+
+        message_with_prefix
     }
 
     /// Token Transfer Message Format:
