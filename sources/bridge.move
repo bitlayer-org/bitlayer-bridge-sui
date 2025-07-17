@@ -165,8 +165,7 @@ module bridge::bridge {
     //////////////////////////////////////////////////////
     // initialization functions
     //
-    #[allow(lint(self_transfer))]
-    public(package) fun initializer(ctx: &mut TxContext) {
+    fun init(ctx: &mut TxContext) {
       let admin_cap = AdminCap{
         id: object::new(ctx),
         version: CURRENT_VERSION,
