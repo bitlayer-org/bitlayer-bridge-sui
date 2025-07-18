@@ -10,8 +10,9 @@ export const migrateBridgeVersion = async (suiClient: SuiClient, tx: Transaction
   tx.moveCall({
     target: `${config.package()}::bridge::migrate_bridge_version`,
     arguments: [
+      tx.object(config.admin_cap()),
       tx.object(config.bridge()),
-      tx.object(config.admin_cap())
+      
     ],
   })
 
