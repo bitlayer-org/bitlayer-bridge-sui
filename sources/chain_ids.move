@@ -30,6 +30,7 @@ module bridge::chain_ids {
         fee_percentage: u64,
         bridge_amount: u64,
         supported: bool,
+        min_amount: u64,
     }
 
 
@@ -49,7 +50,8 @@ module bridge::chain_ids {
         token: u8,
         fee_percentage: u64,
         bridge_amount: u64,
-        supported: bool
+        supported: bool,
+        min_amount: u64
       ) {
           assert!(fee_percentage < PERCENTAGE_DENOMINATOR, EInvalidBridgeRouteFeePercentage);
           let route = BridgeRoute{
@@ -60,6 +62,7 @@ module bridge::chain_ids {
             fee_percentage,
             bridge_amount,
             supported,
+            min_amount,
           };
           if (self.routes.contains(&route)) {
             let _value = self.routes.get_mut(&route);
@@ -84,6 +87,25 @@ module bridge::chain_ids {
         }
     }
 
+    public(package) fun update_bridge_min_amount(
+        self: &mut BridgeSupportedRoutes,
+        route: &BridgeRoute,
+        min_amount: u64
+    ){
+        let value = self.routes.get_mut(route);
+        value.min_amount = min_amount;
+    }
+
+    public(package) fun update_bridge_fee_percentage(
+        self: &mut BridgeSupportedRoutes,
+        route: &BridgeRoute,
+        fee_percentage: u64
+    ){
+        assert!(fee_percentage < PERCENTAGE_DENOMINATOR, EInvalidBridgeRouteFeePercentage);
+        let value = self.routes.get_mut(route);
+        value.fee_percentage = fee_percentage;
+    }
+
     public(package) fun get_fees(
         self: &BridgeSupportedRoutes,
         route: &BridgeRoute,
@@ -94,6 +116,15 @@ module bridge::chain_ids {
         
         let _value = value.destroy_some();
         ((_value.fee_percentage as u128) * (amount as u128) / (PERCENTAGE_DENOMINATOR as u128)) as u64
+    }
+
+    public(package) fun get_min_amount(
+        self: &BridgeSupportedRoutes,
+        route: &BridgeRoute
+    ): u64 {
+        let value = self.routes.try_get(route);
+        assert!(value.is_some(), ERouteNotSupported);
+        value.destroy_some().min_amount
     }
     //////////////////////////////////////////////////////
     // Public functions

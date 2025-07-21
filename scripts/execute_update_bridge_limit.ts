@@ -67,7 +67,7 @@ export const executeUpdateBridgeLimit = async (
       tx.pure.u64(_result.results[0].returnValues[0][0].shift()),
       tx.pure.u8(250),
       tx.pure.u8(88),
-      tx.pure.u64(1000 * 10 ** 8),
+      tx.pure.u64(0.1 * 10 ** 8),
     ],
   })
   tx.moveCall({

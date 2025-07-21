@@ -18,7 +18,8 @@ module bridge::bridge {
     use bridge::limiter::{Self, TransferLimiter};
     use bridge::message::{
         Self, BridgeMessage, BridgeMessageKey, EmergencyOp, UpdateAssetPrice,
-        UpdateBridgeLimit, AddTokenOnSui, AddRoutesOnSui, ParsedTokenTransferMessage,
+        UpdateBridgeLimit, UpdateBridgeMinAmount, UpdateBridgeFeePercentage,
+        AddTokenOnSui, AddRoutesOnSui, ParsedTokenTransferMessage,
         to_parsed_token_transfer_message,
     };
     use bridge::message_types;
@@ -117,6 +118,7 @@ module bridge::bridge {
     const EInitCommitteeParamsInvalid: u64 = 22;
     const EWrongAdminCapVersion: u64 = 23;
     const EVersionNoUpdateRequired: u64 = 24;
+    const EInsufficientBridgeAmount: u64 = 25;
     
     const CURRENT_VERSION: u64 = 1;
     
@@ -362,6 +364,8 @@ module bridge::bridge {
         let mut token_balance = token.into_balance();
         let original_amount = token_balance.value();
         let fees = inner.routes.get_fees(&route, original_amount);
+        let min_amount = inner.routes.get_min_amount(&route);
+        assert!(original_amount >= min_amount, EInsufficientBridgeAmount);
 
         // transfer fees to fee recipient;
         if (fees > 0) {
@@ -561,6 +565,12 @@ module bridge::bridge {
         } else if (message_type == message_types::add_routes_on_sui()) {
             let payload = message.extract_add_routes_on_sui();
             inner.execute_add_routes_on_sui(payload);
+        } else if (message_type == message_types::update_bridge_min_amount()) {
+            let payload = message.extract_update_bridge_min_amount();
+            inner.execute_update_bridge_min_amount(payload);
+        } else if (message_type == message_types::update_bridge_fee_percentage()) {
+            let payload = message.extract_update_bridge_fee_percentage();
+            inner.execute_update_bridge_fee_percentage(payload);
         } else {
             abort EUnexpectedMessageType
         };
@@ -754,6 +764,26 @@ module bridge::bridge {
         )
     }
 
+    fun execute_update_bridge_min_amount(inner: &mut BridgeInner, payload: UpdateBridgeMinAmount) {
+        let sending_chain = payload.update_bridge_min_amount_payload_sending_chain();
+        assert!(sending_chain != inner.chain_id, EUnexpectedChainID);
+        let route = inner.routes.get_route(
+            payload.update_bridge_min_amount_payload_sending_chain(),
+            payload.update_bridge_min_amount_payload_sending_token()
+        );
+        inner.routes.update_bridge_min_amount(&route, payload.update_bridge_min_amount_payload_min_amount())
+    }
+
+    fun execute_update_bridge_fee_percentage(inner: &mut BridgeInner, payload: UpdateBridgeFeePercentage) {
+        let sending_chain = payload.update_bridge_fee_percentage_payload_sending_chain();
+        assert!(sending_chain != inner.chain_id, EUnexpectedChainID);
+        let route = inner.routes.get_route(
+            payload.update_bridge_fee_percentage_payload_sending_chain(),
+            payload.update_bridge_fee_percentage_payload_sending_token()
+        );
+        inner.routes.update_bridge_fee_percentage(&route, payload.update_bridge_fee_percentage_payload_fee_percentage())
+    }
+
     fun execute_update_asset_price(inner: &mut BridgeInner, payload: UpdateAssetPrice) {
         inner.treasury.update_asset_notional_price(
             payload.update_asset_price_payload_token_id(),
@@ -788,12 +818,14 @@ module bridge::bridge {
         let mut fee_percentages = payload.fee_percentages();
         let mut bridge_amounts = payload.bridge_amounts();
         let mut supporteds = payload.supporteds();
+        let mut min_amounts = payload.min_amounts();
 
         // Make sure token data is consistent
         assert!(token_ids.length() == chain_ids.length(), EMalformedMessageError);
         assert!(token_ids.length() == supporteds.length(), EMalformedMessageError);
         assert!(token_ids.length() == fee_percentages.length(), EMalformedMessageError);
         assert!(token_ids.length() == bridge_amounts.length(), EMalformedMessageError);
+        assert!(token_ids.length() == min_amounts.length(), EMalformedMessageError);
 
         while (token_ids.length() > 0) {
             let chain_id = chain_ids.pop_back();
@@ -801,7 +833,8 @@ module bridge::bridge {
             let fee_percentage = fee_percentages.pop_back();
             let bridge_amount = bridge_amounts.pop_back();
             let supported = supporteds.pop_back();
-            inner.routes.add_new_route(chain_id, token_id, fee_percentage, bridge_amount,  supported)
+            let min_amount = min_amounts.pop_back();
+            inner.routes.add_new_route(chain_id, token_id, fee_percentage, bridge_amount,  supported, min_amount)
         }
     }
 

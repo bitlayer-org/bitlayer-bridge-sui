@@ -287,12 +287,11 @@ module bridge::committee {
             let mut found = false;
 
             while (member_idx < self.members.size()) {
-                let (pub_key, member) = self.members.get_entry_by_idx_mut(member_idx);
-                let eth_address = crypto::ecdsa_pub_key_to_eth_address(pub_key);
+                let (eth_address, member) = self.members.get_entry_by_idx_mut(member_idx);
 
                 if (*target_address == eth_address) {
                     member.blocklisted = blocklisted;
-                    pub_keys.push_back(*pub_key);
+                    pub_keys.push_back(*eth_address);
                     found = true;
                     member_idx = 0;
                     break

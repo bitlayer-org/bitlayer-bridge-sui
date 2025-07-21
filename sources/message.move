@@ -71,6 +71,18 @@ module bridge::message {
         limit: u64
     }
 
+    public struct UpdateBridgeMinAmount has drop {
+        sending_chain: u8,
+        sending_token: u8,
+        min_amount: u64
+    }
+
+    public struct UpdateBridgeFeePercentage has drop {
+        sending_chain: u8,
+        sending_token: u8,
+        fee_percentage: u64
+    }
+
     public struct UpdateAssetPrice has drop {
         token_id: u8,
         new_price: u64
@@ -89,6 +101,7 @@ module bridge::message {
         fee_percentages: vector<u64>,
         bridge_amounts: vector<u64>,
         supporteds: vector<bool>,
+        min_amounts: vector<u64>,
     }
 
     // For read
@@ -178,6 +191,38 @@ module bridge::message {
         }
     }
 
+    public fun extract_update_bridge_min_amount(message: &BridgeMessage): UpdateBridgeMinAmount {
+        let mut bcs = bcs::new(message.payload);
+        let sending_chain = bcs.peel_u8();
+        let sending_token = bcs.peel_u8();
+        let min_amount = peel_u64_be(&mut bcs);
+
+        chain_ids::assert_valid_chain_id(message.source_chain);
+        assert!(bcs.into_remainder_bytes().is_empty(), ETrailingBytes);
+
+        UpdateBridgeMinAmount {
+            sending_chain,
+            sending_token,
+            min_amount
+        }
+    }
+
+    public fun extract_update_bridge_fee_percentage(message: &BridgeMessage): UpdateBridgeFeePercentage {
+        let mut bcs = bcs::new(message.payload);
+        let sending_chain = bcs.peel_u8();
+        let sending_token = bcs.peel_u8();
+        let fee_percentage = peel_u64_be(&mut bcs);
+
+        chain_ids::assert_valid_chain_id(message.source_chain);
+        assert!(bcs.into_remainder_bytes().is_empty(), ETrailingBytes);
+
+        UpdateBridgeFeePercentage {
+            sending_chain,
+            sending_token,
+            fee_percentage
+        }
+    }
+
     public fun extract_update_asset_price(message: &BridgeMessage): UpdateAssetPrice {
         let mut bcs = bcs::new(message.payload);
         let token_id = bcs.peel_u8();
@@ -220,6 +265,7 @@ module bridge::message {
         let fee_percentages = bcs.peel_vec_u64();
         let bridge_amounts = bcs.peel_vec_u64();
         let supporteds = bcs.peel_vec_bool();
+        let min_amounts = bcs.peel_vec_u64();
 
         assert!(bcs.into_remainder_bytes().is_empty(), ETrailingBytes);
         AddRoutesOnSui {
@@ -228,6 +274,7 @@ module bridge::message {
             fee_percentages,
             bridge_amounts,
             supporteds,
+            min_amounts,
         }
     }
 
@@ -446,6 +493,7 @@ module bridge::message {
         fee_percentages: vector<u64>,
         bridge_amounts: vector<u64>,
         supporteds: vector<bool>,
+        min_amounts: vector<u64>,
     ): BridgeMessage {
         chain_ids::assert_valid_chain_id(source_chain);
         let mut payload = bcs::to_bytes(&supported_chain_ids);
@@ -453,6 +501,7 @@ module bridge::message {
         payload.append(bcs::to_bytes(&fee_percentages));
         payload.append(bcs::to_bytes(&bridge_amounts));
         payload.append(bcs::to_bytes(&supporteds));
+        payload.append(bcs::to_bytes(&min_amounts));
 
         BridgeMessage {
             message_type: message_types::add_routes_on_sui(),
@@ -487,6 +536,50 @@ module bridge::message {
         payload.append(bcs::to_bytes(&token_prices));
         BridgeMessage {
             message_type: message_types::add_tokens_on_sui(),
+            message_version: CURRENT_MESSAGE_VERSION,
+            seq_num,
+            source_chain,
+            payload,
+        }
+    }
+
+    public fun create_update_bridge_min_amount_message(
+        source_chain: u8,
+        seq_num: u64,
+        sending_chain: u8,
+        sending_token: u8,
+        min_amount: u64,
+    ): BridgeMessage {
+        chain_ids::assert_valid_chain_id(source_chain);
+        let mut payload = vector[];
+        payload.push_back(sending_chain);
+        payload.push_back(sending_token);
+        payload.append(reverse_bytes(bcs::to_bytes(&min_amount)));
+
+        BridgeMessage {
+            message_type: message_types::update_bridge_min_amount(),
+            message_version: CURRENT_MESSAGE_VERSION,
+            seq_num,
+            source_chain,
+            payload,
+        }
+    }
+
+    public fun create_update_bridge_fee_percentage_message(
+        source_chain: u8,
+        seq_num: u64,
+        sending_chain: u8,
+        sending_token: u8,
+        fee_percentage: u64,
+    ): BridgeMessage {
+        chain_ids::assert_valid_chain_id(source_chain);
+        let mut payload = vector[];
+        payload.push_back(sending_chain);
+        payload.push_back(sending_token);
+        payload.append(reverse_bytes(bcs::to_bytes(&fee_percentage)));
+
+        BridgeMessage {
+            message_type: message_types::update_bridge_fee_percentage(),
             message_version: CURRENT_MESSAGE_VERSION,
             seq_num,
             source_chain,
@@ -560,6 +653,30 @@ module bridge::message {
         self.sending_token
     }
 
+    public fun update_bridge_min_amount_payload_sending_chain(self: &UpdateBridgeMinAmount): u8 {
+        self.sending_chain
+    }
+
+    public fun update_bridge_min_amount_payload_sending_token(self: &UpdateBridgeMinAmount): u8 {
+        self.sending_token
+    }
+
+    public fun update_bridge_min_amount_payload_min_amount(self: &UpdateBridgeMinAmount): u64 {
+        self.min_amount
+    }
+
+    public fun update_bridge_fee_percentage_payload_sending_chain(self: &UpdateBridgeFeePercentage): u8 {
+        self.sending_chain
+    }
+
+    public fun update_bridge_fee_percentage_payload_sending_token(self: &UpdateBridgeFeePercentage): u8 {
+        self.sending_token
+    }
+
+    public fun update_bridge_fee_percentage_payload_fee_percentage(self: &UpdateBridgeFeePercentage): u64 {
+        self.fee_percentage
+    }
+
     public fun update_bridge_limit_payload_limit(self: &UpdateBridgeLimit): u64 {
         self.limit
     }
@@ -594,6 +711,10 @@ module bridge::message {
 
     public fun supported_token_ids(self: &AddRoutesOnSui): vector<u8> {
         self.supported_token_ids
+    }
+
+    public fun min_amounts(self: &AddRoutesOnSui): vector<u64> {
+        self.min_amounts
     }
 
     public fun fee_percentages(self: &AddRoutesOnSui): vector<u64> {

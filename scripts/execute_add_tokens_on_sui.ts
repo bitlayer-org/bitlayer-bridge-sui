@@ -46,7 +46,7 @@ export const executeAddTokensOnSUI = async (
     for (let token of config.supported_chains[id]) {
       token_types.push(new Uint8Array(__result.results[1].returnValues[0][0]))
       supported_token_ids.push(token.token_id)
-      token_prices.push(1)
+      token_prices.push(1 * 10 ** 8)
     }
   }
 

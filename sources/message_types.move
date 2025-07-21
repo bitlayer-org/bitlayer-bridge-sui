@@ -10,6 +10,8 @@ module bridge::message_types {
     const UPDATE_ASSET_PRICE: u8 = 4;
     const ADD_TOKENS_ON_SUI: u8 = 6;
     const ADD_ROUTES_ON_SUI: u8 = 7;
+    const UPDATE_BRIDGE_MIN_AMOUNT: u8 = 8;
+    const UPDATE_BRIDGE_FEE_PERCENTAGE: u8 = 9;
 
     public fun token(): u8 { TOKEN }
 
@@ -23,4 +25,6 @@ module bridge::message_types {
 
     public fun add_tokens_on_sui(): u8 { ADD_TOKENS_ON_SUI }
     public fun add_routes_on_sui(): u8 { ADD_ROUTES_ON_SUI }
+    public fun update_bridge_min_amount(): u8 { UPDATE_BRIDGE_MIN_AMOUNT }
+    public fun update_bridge_fee_percentage(): u8 { UPDATE_BRIDGE_FEE_PERCENTAGE }
 }
