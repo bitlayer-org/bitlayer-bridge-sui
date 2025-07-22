@@ -289,7 +289,7 @@ module bridge::committee {
             while (member_idx < self.members.size()) {
                 let (eth_address, member) = self.members.get_entry_by_idx_mut(member_idx);
 
-                if (*target_address == eth_address) {
+                if (*target_address == *eth_address) {
                     member.blocklisted = blocklisted;
                     pub_keys.push_back(*eth_address);
                     found = true;
