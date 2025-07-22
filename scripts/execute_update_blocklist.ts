@@ -34,7 +34,7 @@ export const executeBlocklist = async (
     arguments: [
       tx.pure.u8(config.id),
       tx.pure.u64(_result.results[0].returnValues[0][0].shift()),
-      tx.pure.u8(1),
+      tx.pure.u8(1), // 0 blocked 1 unblocked
       tx.pure(bcs.vector(bcs.vector(bcs.u8())).serialize(pubkeys))
     ],
   })

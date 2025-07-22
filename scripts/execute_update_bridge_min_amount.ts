@@ -5,7 +5,7 @@ import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519'
 import { SuiClient } from '@mysten/sui/dist/cjs/client'
 import { ethers } from 'ethers'
 
-export const executeUpdateBridgeLimit = async (
+export const updateBridgeMinAmount = async (
   suiClient: SuiClient,
   tx: Transaction
 ) => {

@@ -18,7 +18,12 @@ export const config = {
   committees: [
     {
       address: () => process.env.COMMITTEE1 || '',
-      staked: 10001,
+      staked: 3333,
+      isblacklisted: false,
+    },
+    {
+      address: () => process.env.COMMITTEE2 || '',
+      staked: 3333,
       isblacklisted: false,
     }
   ],
@@ -30,6 +35,7 @@ export const config = {
         bridge_amount: 0,
         supported: true,
         limit: 10 ** 8 * 1000,
+        min_amount: 10 ** 8 * 0.001,
       },
     ],
   },
@@ -43,4 +49,6 @@ export enum MessageType {
   UPDATE_ASSET_PRICE = 4,
   ADD_TOKENS_ON_SUI = 6,
   ADD_ROUTES_ON_SUI = 7,
+  UPDATE_BRIDGE_MIN_AMOUNT = 8,
+  UPDATE_BRIDGE_FEE_PERCENTAGE = 9,
 }

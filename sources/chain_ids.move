@@ -3,6 +3,7 @@
 
 module bridge::chain_ids {
     use sui::vec_map::{Self, VecMap};
+    use sui::event::emit;
 
     // Chain IDs
     const SUI_CHAIN_ID: u8 = 16;
@@ -31,6 +32,18 @@ module bridge::chain_ids {
         bridge_amount: u64,
         supported: bool,
         min_amount: u64,
+    }
+
+    public struct UpdateTokenBridgeMinAmountEvent has copy, drop {
+        destination: u8,
+        token_id: u8,
+        new_min_amount: u64,
+    }
+
+    public struct UpdateTokenBridgeFeePercentageEvent has copy, drop {
+        destination: u8,
+        token_id: u8,
+        new_fee_percentage: u64,
     }
 
 
@@ -94,6 +107,12 @@ module bridge::chain_ids {
     ){
         let value = self.routes.get_mut(route);
         value.min_amount = min_amount;
+
+        emit(UpdateTokenBridgeMinAmountEvent {
+            destination: route.destination,
+            token_id: route.token,
+            new_min_amount: min_amount,
+        });
     }
 
     public(package) fun update_bridge_fee_percentage(
@@ -104,6 +123,12 @@ module bridge::chain_ids {
         assert!(fee_percentage < PERCENTAGE_DENOMINATOR, EInvalidBridgeRouteFeePercentage);
         let value = self.routes.get_mut(route);
         value.fee_percentage = fee_percentage;
+
+        emit(UpdateTokenBridgeFeePercentageEvent {
+            destination: route.destination,
+            token_id: route.token,
+            new_fee_percentage: fee_percentage,
+        });
     }
 
     public(package) fun get_fees(

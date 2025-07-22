@@ -39,27 +39,6 @@ export const executeUpdateBridgeLimit = async (
     sender: keypair.getPublicKey().toSuiAddress(),
   })
 
-
-  // const bridgeMessage = new Uint8Array(_result.results[1].returnValues[0][0])
-
-  // _result.results[2].returnValues[0][0].shift()
-  // const serializeMessage = new Uint8Array(_result.results[2].returnValues[0][0])
-  // const signatures = []
-  // for (let c of config.committees) {
-  //   const signingKey = new ethers.SigningKey(Buffer.from(c.privateKey(), 'hex'))
-  //   const signature = fromHex(
-  //     signingKey.sign(ethers.keccak256(serializeMessage)).serialized
-  //   )
-  //   signatures.push(signature)
-  // }
-
-  /**
-   * source_chain_id: u8,
-        seq_num: u64,
-        sending_chain: u8,
-        sending_token: u8,
-        new_limit: u64,
-   */
   const [message] = tx.moveCall({
     target: `${config.package()}::message::create_update_bridge_limit_message`,
     arguments: [
