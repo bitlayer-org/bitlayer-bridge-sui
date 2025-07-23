@@ -1,6 +1,6 @@
 [package]
 name = "Bridge"
-version = "0.0.2"
+version = "0.0.1"
 # published-at = "0x45b8ad80ead412878fdbffaadca2c675648e474c947242c2455875eb66f32de3"
 edition = "2024.beta"
 
