@@ -9,15 +9,16 @@ export const createCommittee = async (
   suiClient: SuiClient,
   tx: Transaction
 ) => {
-  const keypair = Ed25519Keypair.fromSecretKey(config.submitter() || '')
+  const keypair = Ed25519Keypair.fromSecretKey(fromHex(config.admin()) || '')
   const pubkeys = []
   const stakeds = []
   config.committees.map((c) => {
-    const wallet = new ethers.Wallet(c.privateKey())
+    // const wallet = new ethers.Wallet(c.address())
+    // console.log(wallet.address)
+    // console.log(fromHex(wallet.address))
     // wallet.address
     // const sign = new SigningKey(c.privateKey())
-
-    pubkeys.push(fromHex(wallet.address))
+    pubkeys.push(fromHex(c.address()))
     stakeds.push(c.staked)
   })
 
@@ -28,7 +29,7 @@ export const createCommittee = async (
       tx.object(config.admin_cap()),
       tx.pure(bcs.vector(bcs.vector(bcs.u8())).serialize(pubkeys)),
       tx.pure.vector('u64', stakeds),
-      tx.pure.u64(10000),
+      tx.pure.u64(5000),
     ],
   })
 

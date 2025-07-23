@@ -5,32 +5,22 @@ import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519'
 import { SuiClient } from '@mysten/sui/dist/cjs/client'
 import { ethers } from 'ethers'
 
-export const executeUpdateBridgeLimit = async (
+export const executeBlocklist = async (
   suiClient: SuiClient,
   tx: Transaction
 ) => {
   const keypair = Ed25519Keypair.fromSecretKey(fromHex(config.admin()) || '')
-  const supported_chain_ids = []
-  const supported_token_ids = []
-  const fee_percentages = []
-  const bridge_amounts = []
-  const supporteds = []
-  for (let id in config.supported_chains) {
-    for (let token of config.supported_chains[id]) {
-      supported_chain_ids.push(id)
-      supported_token_ids.push(token.token_id)
-      fee_percentages.push(token.fee_percentage)
-      bridge_amounts.push(token.bridge_amount)
-      supporteds.push(token.supported)
-    }
-  }
+  const pubkeys = []
+  config.committees.map((c) => {
+    pubkeys.push(fromHex(c.address()))
+  })
 
   const _tx = new Transaction()
   _tx.moveCall({
     target: `${config.package()}::bridge::get_current_seq_num`,
     arguments: [
       _tx.object(config.bridge()),
-      _tx.pure.u8(MessageType.UPDATE_BRIDGE_LIMIT),
+      _tx.pure.u8(MessageType.COMMITTEE_BLOCKLIST),
     ],
   })
 
@@ -40,13 +30,12 @@ export const executeUpdateBridgeLimit = async (
   })
 
   const [message] = tx.moveCall({
-    target: `${config.package()}::message::create_update_bridge_limit_message`,
+    target: `${config.package()}::message::create_blocklist_message`,
     arguments: [
       tx.pure.u8(config.id),
       tx.pure.u64(_result.results[0].returnValues[0][0].shift()),
-      tx.pure.u8(1),
-      tx.pure.u8(1),
-      tx.pure.u64(0.50 * 10 ** 8),
+      tx.pure.u8(1), // 0 blocked 1 unblocked
+      tx.pure(bcs.vector(bcs.vector(bcs.u8())).serialize(pubkeys))
     ],
   })
   tx.moveCall({

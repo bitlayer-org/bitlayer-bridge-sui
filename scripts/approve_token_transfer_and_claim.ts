@@ -3,24 +3,21 @@ import { Transaction } from '@mysten/sui/transactions'
 import { config, MessageType, MessageVersion } from './config'
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519'
 import { SuiClient } from '@mysten/sui/dist/cjs/client'
-import { ethers } from 'ethers'
+import { ethers, toUtf8Bytes, Wallet } from 'ethers'
 
 export const approveTokenTransferAndClaim = async (
   suiClient: SuiClient,
   tx: Transaction
 ) => {
   const keypair = Ed25519Keypair.fromSecretKey(
-    process.env.ADMIN_PRIVATE_KEY || ''
-  )
-  const user = Ed25519Keypair.fromSecretKey(
-    process.env.SUI_TEST_PRIVATE_KEY || ''
+    fromHex(process.env.ADMIN_PRIVATE_KEY || '')
   )
 
-  let source_chain = 4
+  let source_chain = 250
   let sender_address = fromHex(process.env.EVM_USER_ADDRESS || '')
   let target_chain = 16
-  let target_address = fromHex(user.getPublicKey().toSuiAddress())
-  let token_type = 5
+  let target_address = fromHex(keypair.getPublicKey().toSuiAddress())
+  let token_type = 88
   let amount = 0.1 * 1e10
   let seq_num = 1
 
@@ -107,20 +104,66 @@ export const approveTokenTransferAndClaim = async (
   console.log('SerializeMessage: ', _result.results[1].returnValues[0][0])
 
   console.log('source_message:', toHex(source_message))
+  // process.exit(0)
+  // return
+  
   //   return
   //   const serializeMessage = new Uint8Array(_result.results[1].returnValues[0][0])
   const serializeMessage = source_message
   console.log('SerializeMessage:', toHex(serializeMessage))
   const signatures = []
+  console.log('--------------------------------')
+  console.log(toUtf8Bytes('\x19Ethereum Signed Message:\n'))
+  console.log(String(source_message.length))
+  console.log(toUtf8Bytes(String(source_message.length)))
+  console.log('--------------------------------')
   for (let c of config.committees) {
-    const signingKey = new ethers.SigningKey(c.privateKey())
-    const signature = fromHex(
-      signingKey.sign(ethers.keccak256(serializeMessage)).serialized
-    )
-    signatures.push(signature)
+    const wallet = new Wallet(config.admin())
+    const signature = await wallet.signMessage(ethers.getBytes(serializeMessage))
+    // console.log('signature:', signature)
+    
+    // const signingKey = new ethers.SigningKey(fromHex(config.admin()))
+    // const signature = fromHex(
+    //   signingKey.sign(ethers.keccak256(serializeMessage)).serialized
+    // )
+    signatures.push(fromHex(signature))
   }
 
   const [message] = tx.moveCall({
+    target: `${config.package()}::message::create_token_bridge_message`,
+    arguments: [
+      tx.pure.u8(source_chain),
+      tx.pure.u64(seq_num),
+      tx.pure(bcs.vector(bcs.u8()).serialize(sender_address)),
+      tx.pure.u8(target_chain),
+      tx.pure(bcs.vector(bcs.u8()).serialize(target_address)),
+      tx.pure.u8(token_type),
+      tx.pure.u64(amount),
+    ],
+  })
+
+  tx.moveCall({
+    target: `${config.package()}::committee::recover_signer`,
+    arguments: [
+      message,
+      bcs.vector(bcs.u8()).serialize(signatures[0]),
+    ],
+  })
+
+
+  const result1 = await suiClient.devInspectTransactionBlock({
+    transactionBlock: tx,
+    sender: keypair.getPublicKey().toSuiAddress(),
+  })
+
+  console.log(new Wallet(config.admin()).address)
+  console.log(fromHex(new Wallet(config.admin()).address))
+
+  console.log('res:', result1.results[1].returnValues)
+
+  return
+
+  tx.moveCall({
     target: `${config.package()}::message::create_token_bridge_message`,
     arguments: [
       tx.pure.u8(source_chain),
