@@ -18,24 +18,34 @@ export const config = {
   committees: [
     {
       address: () => process.env.COMMITTEE1 || '',
-      staked: 3333,
+      staked: 2222,
       isblacklisted: false,
     },
     {
       address: () => process.env.COMMITTEE2 || '',
-      staked: 3333,
+      staked: 2222,
+      isblacklisted: false,
+    },
+    {
+      address: () => process.env.COMMITTEE3 || '',
+      staked: 2222,
+      isblacklisted: false,
+    },
+    {
+      address: () => process.env.COMMITTEE4 || '',
+      staked: 2222,
       isblacklisted: false,
     }
   ],
   supported_chains: {
-    250: [
+    1: [
       {
-        token_id: 88,
-        fee_percentage: 1000,
+        token_id: 1,
+        fee_percentage: 0,
         bridge_amount: 0,
         supported: true,
-        limit: 10 ** 8 * 1000,
-        min_amount: 10 ** 8 * 0.001,
+        limit: 50 ** 8 * 1000,
+        min_amount: 0.0001 ** 8 * 0.001,
       },
     ],
   },

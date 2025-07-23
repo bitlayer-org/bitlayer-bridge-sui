@@ -16,7 +16,7 @@ export const updateFeeRecipient = async (
     arguments: [
       tx.object(config.bridge()),
       tx.object(config.admin_cap()),
-      tx.pure.address("0x9c4d23fa4891160c6a734487d0df87919a7daaa926e65ed577887e0cd55054ef")
+      tx.pure.address("0x5b8a0fd0d7540c1930e5201c4f21c07d02ab873b49cd3e7e5b121db311c8f4b5")
     ],
   })
 

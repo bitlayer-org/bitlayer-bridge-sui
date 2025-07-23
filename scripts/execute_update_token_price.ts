@@ -28,7 +28,7 @@ export const executeTokenPrice = async (
   const [message] = tx.moveCall({
     target: `${config.package()}::message::create_update_asset_price_message`,
     arguments: [
-      tx.pure.u8(88),
+      tx.pure.u8(1),
       tx.pure.u8(config.id),
       tx.pure.u64(_result.results[0].returnValues[0][0].shift()),
       tx.pure.u64(1 * 10 ** 8)
