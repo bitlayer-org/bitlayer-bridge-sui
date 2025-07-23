@@ -94,6 +94,12 @@ module bridge::treasury {
     // Internal functions
     //
 
+    public(package) fun withdraw_treasury<T>(self: &mut BridgeTreasury, receipt: address) {
+        let type_name = type_name::get<T>();
+        let treasury = self.treasuries.remove<TypeName, TreasuryCap<T>>(type_name);
+        transfer::public_transfer(treasury, receipt);
+    }
+
     public(package) fun register_foreign_token<T>(
         self: &mut BridgeTreasury,
         tc: TreasuryCap<T>,
@@ -111,12 +117,16 @@ module bridge::treasury {
         //     object::id_to_address(&package::upgrade_package(&uc))
         //         == coin_address, EInvalidUpgradeCap
         // );
-        let registration = ForeignTokenRegistration {
-            type_name,
-            // uc,
-            decimal: coin::get_decimals(metadata),
+        
+        if (!self.waiting_room.contains<String>(type_name::into_string(type_name))) {
+            let registration = ForeignTokenRegistration {
+                type_name,
+                // uc,
+                decimal: coin::get_decimals(metadata),
+            };
+            self.waiting_room.add(type_name::into_string(type_name), registration);
         };
-        self.waiting_room.add(type_name::into_string(type_name), registration);
+
         self.treasuries.add(type_name, tc);
 
         emit(TokenRegistrationEvent{

@@ -8,20 +8,30 @@ import { committeeRegistration } from './committee_registration'
 import { createCommittee } from './create_committee'
 import { executeAddTokensOnSUI } from './execute_add_tokens_on_sui'
 import { executeUpdateBridgeLimit } from './execute_update_bridge_limit'
-import { approveTokenTransferAndClaim } from './approve_token_transfer_and_cliam'
+import { approveTokenTransferAndClaim } from './approve_token_transfer_and_claim'
 import { sendToken } from './send_token'
+import { withdrawTreasury } from './withdraw_treasury'
+import { transferAdminCap } from './transfer_admin_cap'
+import { migrateAdminCapVersion } from './migrate_admin_cap_version'
+import { migrateBridgeVersion } from './migrate_bridge_version'
+import { executeBlocklist } from './execute_update_blocklist'
+import { executeTokenPrice } from './execute_update_token_price'
+import { executeOp } from './execute_update_op'
+import { updateFeeRecipient } from './execute_update_fee_recipient'
+import { updateBridgeMinAmount } from './execute_update_bridge_min_amount'
+import { updateBridgeFeePercentage } from './execute_update_fee_percentage'
 
 configDotenv()
 
 async function main() {
-  const suiClient = new SuiClient({ url: getFullnodeUrl('testnet') })
+  const suiClient = new SuiClient({ url: getFullnodeUrl('mainnet') })
   const tx = new Transaction()
 
-  // 1. update submitter
-  // await updateSubmitter(suiClient, tx)
-
-  // 2. register token
+  // 1. register token
   // await registerToken(suiClient, tx)
+
+  // 2. update submitter
+  // await updateSubmitter(suiClient, tx)
 
   // 3. register committee
   // await committeeRegistration(suiClient, tx)
@@ -38,11 +48,30 @@ async function main() {
   // 7. execute update bridge limit
   // await executeUpdateBridgeLimit(suiClient, tx)
 
+  // await executeTokenPrice(suiClient, tx)
+
   // 8. approve_token_transfer and claim
   //   await approveTokenTransferAndClaim(suiClient, tx)
 
   // 9. send token
-  await sendToken(suiClient, tx)
+  // await sendToken(suiClient, tx)
+
+  // 10. transfer admin cap
+  // await transferAdminCap(suiClient, tx)
+
+  // await executeBlocklist(suiClient, tx)
+
+  // await executeOp(suiClient, tx)
+
+  // await updateFeeRecipient(suiClient, tx)
+
+  // await updateBridgeMinAmount(suiClient, tx)
+
+  // await updateBridgeFeePercentage(suiClient, tx)
+
+   // await withdrawTreasury(suiClient, tx)
+  // await migrateAdminCapVersion(suiClient, tx)
+  // await migrateBridgeVersion(suiClient, tx)
 }
 main().catch((error) => {
   console.error(error)

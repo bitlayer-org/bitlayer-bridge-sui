@@ -1,7 +1,7 @@
 [package]
 name = "Bridge"
 version = "0.0.1"
-# published-at = "0x84f0a6f53cbe3c7c2b586d7e0da8bbcafa1509a37fc4a4e8a393ba1e6779dffb"
+# published-at = "0x45b8ad80ead412878fdbffaadca2c675648e474c947242c2455875eb66f32de3"
 edition = "2024.beta"
 
 [dependencies.Sui]

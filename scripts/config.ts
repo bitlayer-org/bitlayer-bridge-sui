@@ -9,35 +9,43 @@ export const config = {
   package: () => process.env.PACKAGE || '',
   admin_cap: () => process.env.ADMIN_CAP_ID || '',
   bridge: () => process.env.BRIGE_OBJECT_ID || '',
-  submitter: () => process.env.ADMIN_PRIVATE_KEY || '',
+  admin: () => process.env.ADMIN_PRIVATE_KEY || '',
+  submitter: () => process.env.SUBMITTER || '',
   sbtc_coin_type: () => process.env.SBTC_COIN_TYPE || '',
   sbtc_metadata: () => process.env.SBTC_METADATA || '',
   sbtc_treasury: () => process.env.SBTC_TREASURY || '',
+  upgrade_cap: () => process.env.UPGRADE_CAP_ID || '',
   committees: [
     {
-      privateKey: () => process.env.COMMITTEE1 || '',
-      staked: 3334,
+      address: () => process.env.COMMITTEE1 || '',
+      staked: 2222,
       isblacklisted: false,
     },
     {
-      privateKey: () => process.env.COMMITTEE2 || '',
-      staked: 3333,
+      address: () => process.env.COMMITTEE2 || '',
+      staked: 2222,
       isblacklisted: false,
     },
     {
-      privateKey: () => process.env.COMMITTEE3 || '',
-      staked: 3333,
+      address: () => process.env.COMMITTEE3 || '',
+      staked: 2222,
       isblacklisted: false,
     },
+    {
+      address: () => process.env.COMMITTEE4 || '',
+      staked: 2222,
+      isblacklisted: false,
+    }
   ],
   supported_chains: {
-    4: [
+    1: [
       {
-        token_id: 5,
-        fee_percentage: 2000,
+        token_id: 1,
+        fee_percentage: 0,
         bridge_amount: 0,
         supported: true,
-        limit: 10 ** 10 * 3500,
+        limit: 50 ** 8 * 1000,
+        min_amount: 0.0001 ** 8 * 0.001,
       },
     ],
   },
@@ -51,4 +59,6 @@ export enum MessageType {
   UPDATE_ASSET_PRICE = 4,
   ADD_TOKENS_ON_SUI = 6,
   ADD_ROUTES_ON_SUI = 7,
+  UPDATE_BRIDGE_MIN_AMOUNT = 8,
+  UPDATE_BRIDGE_FEE_PERCENTAGE = 9,
 }

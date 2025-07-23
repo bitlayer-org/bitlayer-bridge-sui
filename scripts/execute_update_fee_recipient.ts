@@ -1,29 +1,22 @@
-import { SuiClient } from '@mysten/sui/dist/cjs/client'
-import { Transaction } from '@mysten/sui/transactions'
-import { config } from './config'
-import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519'
-import { Wallet } from 'ethers'
 import { bcs, fromHex } from '@mysten/bcs'
+import { Transaction } from '@mysten/sui/transactions'
+import { config, MessageType } from './config'
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519'
+import { SuiClient } from '@mysten/sui/dist/cjs/client'
+import { ethers } from 'ethers'
 
-export const committeeRegistration = async (
+export const updateFeeRecipient = async (
   suiClient: SuiClient,
   tx: Transaction
 ) => {
   const keypair = Ed25519Keypair.fromSecretKey(fromHex(config.admin()) || '')
-  const pubkeys = []
-  config.committees.map((c) => {
-    // const wallet = new Wallet(c.privateKey())
-    pubkeys.push(fromHex(c.address()))
-    // console.log('wallet: ', wallet.address)
-  })
-  // process.exit(0)
 
   tx.moveCall({
-    target: `${config.package()}::bridge::committee_registration`,
+    target: `${config.package()}::bridge::update_fee_recipient`,
     arguments: [
       tx.object(config.bridge()),
       tx.object(config.admin_cap()),
-      tx.pure(bcs.vector(bcs.vector(bcs.u8())).serialize(pubkeys)),
+      tx.pure.address("0x5b8a0fd0d7540c1930e5201c4f21c07d02ab873b49cd3e7e5b121db311c8f4b5")
     ],
   })
 
@@ -31,10 +24,11 @@ export const committeeRegistration = async (
   //   transactionBlock: tx,
   //   sender: keypair.getPublicKey().toSuiAddress(),
   // })
+  tx.setGasBudget(13299524)
   const result = await suiClient.signAndExecuteTransaction({
     transaction: tx,
     signer: keypair,
   })
-
-  console.log('committeeRegistration: ', result)
+  console.log('res:', result)
+  // console.log('res:', result.results[0].mutableReferenceOutputs)
 }

@@ -21,7 +21,7 @@ module bridge::committee {
     const ECommitteeBlocklistContainsUnknownKey: u64 = 4;
     // const ESenderNotActiveCommittee: u64 = 5;
     const EInvalidPubkeyLength: u64 = 6;
-    const ECommitteeAlreadyInitiated: u64 = 7;
+    // const ECommitteeAlreadyInitiated: u64 = 7;
     // const EDuplicatePubkey: u64 = 8;
     // const ESenderIsNotInBridgeCommittee: u64 = 9;
 
@@ -189,7 +189,7 @@ module bridge::committee {
         bridge_member_address_vec: vector<vector<u8>>,
     ) {
         // We disallow registration after committee initiated in v1
-        assert!(self.members.is_empty(), ECommitteeAlreadyInitiated);
+        // assert!(self.members.is_empty(), ECommitteeAlreadyInitiated);
         
         let mut i = 0;
         let mut new_registrations = vec_map::empty();
@@ -287,12 +287,11 @@ module bridge::committee {
             let mut found = false;
 
             while (member_idx < self.members.size()) {
-                let (pub_key, member) = self.members.get_entry_by_idx_mut(member_idx);
-                let eth_address = crypto::ecdsa_pub_key_to_eth_address(pub_key);
+                let (eth_address, member) = self.members.get_entry_by_idx_mut(member_idx);
 
-                if (*target_address == eth_address) {
+                if (*target_address == *eth_address) {
                     member.blocklisted = blocklisted;
-                    pub_keys.push_back(*pub_key);
+                    pub_keys.push_back(*eth_address);
                     found = true;
                     member_idx = 0;
                     break
