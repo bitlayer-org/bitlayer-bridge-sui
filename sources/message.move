@@ -742,7 +742,7 @@ module bridge::message {
         let message_type = message_type(self);
 
         if (message_type == message_types::token()) {
-            3334
+            6666
         } else if (message_type == message_types::emergency_op()) {
             let payload = extract_emergency_op_payload(self);
             if (payload.op_type == PAUSE) {
