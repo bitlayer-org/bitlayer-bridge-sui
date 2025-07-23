@@ -8,7 +8,7 @@ import { committeeRegistration } from './committee_registration'
 import { createCommittee } from './create_committee'
 import { executeAddTokensOnSUI } from './execute_add_tokens_on_sui'
 import { executeUpdateBridgeLimit } from './execute_update_bridge_limit'
-import { approveTokenTransferAndClaim } from './approve_token_transfer_and_cliam'
+import { approveTokenTransferAndClaim } from './approve_token_transfer_and_claim'
 import { sendToken } from './send_token'
 import { withdrawTreasury } from './withdraw_treasury'
 import { transferAdminCap } from './transfer_admin_cap'
@@ -24,18 +24,14 @@ import { updateBridgeFeePercentage } from './execute_update_fee_percentage'
 configDotenv()
 
 async function main() {
-  const suiClient = new SuiClient({ url: getFullnodeUrl('testnet') })
+  const suiClient = new SuiClient({ url: getFullnodeUrl('mainnet') })
   const tx = new Transaction()
 
-  // 1. update submitter
-  // await updateSubmitter(suiClient, tx)
-
-  // 2. register token
+  // 1. register token
   // await registerToken(suiClient, tx)
 
-  // await withdrawTreasury(suiClient, tx)
-  // await migrateAdminCapVersion(suiClient, tx)
-  // await migrateBridgeVersion(suiClient, tx)
+  // 2. update submitter
+  // await updateSubmitter(suiClient, tx)
 
   // 3. register committee
   // await committeeRegistration(suiClient, tx)
@@ -58,7 +54,7 @@ async function main() {
   //   await approveTokenTransferAndClaim(suiClient, tx)
 
   // 9. send token
-  await sendToken(suiClient, tx)
+  // await sendToken(suiClient, tx)
 
   // 10. transfer admin cap
   // await transferAdminCap(suiClient, tx)
@@ -72,6 +68,10 @@ async function main() {
   // await updateBridgeMinAmount(suiClient, tx)
 
   // await updateBridgeFeePercentage(suiClient, tx)
+
+   // await withdrawTreasury(suiClient, tx)
+  // await migrateAdminCapVersion(suiClient, tx)
+  // await migrateBridgeVersion(suiClient, tx)
 }
 main().catch((error) => {
   console.error(error)
