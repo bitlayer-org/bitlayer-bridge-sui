@@ -297,16 +297,40 @@ module bridge::message {
         message.push_back(source_chain);
         message.append(payload);
 
-        // message
+        let message_hex = bytes_to_hex(message);
+        let sign_bytes = string::into_bytes(message_hex);
 
-        let length = vector::length(&message);
+        let length = vector::length(&sign_bytes);
 
         let mut message_with_prefix = vector[];
         message_with_prefix.append(PREFIX_ETH);
         message_with_prefix.append(string::into_bytes(length.to_string()));
-        message_with_prefix.append(message);
+        message_with_prefix.append(sign_bytes);
 
         message_with_prefix
+    }
+
+    public fun u8_to_hex(byte: u8): string::String {
+        let hex_chars = b"0123456789abcdef";
+        let high = byte / 16;
+        let low = byte % 16;
+        let mut res = vector::empty<u8>();
+        vector::push_back(&mut res, *vector::borrow(&hex_chars, high as u64));
+        vector::push_back(&mut res, *vector::borrow(&hex_chars, low as u64));
+        string::utf8(res)
+    }
+    
+    public fun bytes_to_hex(bytes: vector<u8>): string::String {
+        let mut hex_string = string::utf8(vector::empty<u8>());
+        let len = vector::length(&bytes);
+        let mut i = 0;
+        while (i < len) {
+            let byte = *vector::borrow(&bytes, i);
+            let hex = u8_to_hex(byte);
+            string::append(&mut hex_string, hex);
+            i = i + 1;
+        };
+        hex_string
     }
 
     /// Token Transfer Message Format:
