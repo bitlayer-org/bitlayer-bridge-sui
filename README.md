@@ -207,7 +207,6 @@ sui move test bridge_tests
 1. **Testnet Usage**: The project is currently configured to use Sui testnet framework
 2. **Private Key Security**: Never hardcode private keys in code, use environment variables
 3. **Version Compatibility**: Ensure Sui CLI version is compatible with the framework version used by the project
-4. **Production Deployment**: Please conduct thorough audits and testing before deploying to production
 
 ## 📞 Contact
 
