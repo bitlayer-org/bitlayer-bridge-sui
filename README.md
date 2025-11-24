@@ -208,6 +208,10 @@ sui move test bridge_tests
 2. **Private Key Security**: Never hardcode private keys in code, use environment variables
 3. **Version Compatibility**: Ensure Sui CLI version is compatible with the framework version used by the project
 
+## Audit report
+
+https://github.com/bitlayer-org/smart-contract-audits
+
 ## 📞 Contact
 
 For questions or suggestions, please contact via GitHub Issues.
